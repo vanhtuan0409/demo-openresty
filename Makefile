@@ -17,5 +17,14 @@ install:
 uninstall:
 	rm -rf ${INSTALL_DIR}
 
-test:
-	echo ${INSTALL_DIR}
+start_nginx:
+	./openresty/bin/openresty -p `pwd`/ -c conf/nginx.conf
+
+stop_nginx:
+	./openresty/bin/openresty -p `pwd`/ -s stop
+
+reload_nginx:
+	./openresty/bin/openresty -p `pwd`/ -s reload
+
+check_nginx:
+	./openresty/bin/openresty -p `pwd`/ -t
