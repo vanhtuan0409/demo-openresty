@@ -12,10 +12,10 @@ install:
 	cd ${DOWNLOAD_DIR}/openresty-${OPENRESTY_VERSION}
 	./configure -j2 --prefix=${INSTALL_DIR}
 	make -j2
-	sudo make install
+	make install
 
 uninstall:
-	sudo rm -rf ${INSTALL_DIR}
+	rm -rf ${INSTALL_DIR}
 
 test:
 	echo ${INSTALL_DIR}
