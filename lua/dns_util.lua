@@ -49,10 +49,10 @@ function _M.resolve(host)
   local addresses
   addresses, err = resolve_host(host, r, r.TYPE_A)
   if not addresses then
-    ngx.log(ngx.ERR, "failed to query the DNS server: " .. tostring(err))
+    ngx.log(ngx.ERR, string.format("failed to query the DNS server: DNS: %s, error: %s", host, tostring(err)))
     return nil
   elseif #addresses == 0 then
-    ngx.log(ngx.ERR, "DNS resolve to empty result")
+    ngx.log(ngx.ERR, "DNS resolve to empty result"..host)
     return nil
   end
 
