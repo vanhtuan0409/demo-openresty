@@ -33,30 +33,30 @@ local function resolve_host(host, r, qtype)
   return addresses, nil
 end
 
-function _M.resolve(host, nameservers)
+function _M.resolve(host)
   local r
   r, err = resolver:new{
-    nameservers = nameservers,
+    nameservers = configuration.nameservers,
     retrans = 5,
     timeout = 2000,  -- 2 sec
   }
 
   if not r then
     ngx.log(ngx.ERR, "failed to instantiate the resolver: " .. tostring(err))
-    return ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
+    return nil
   end
 
   local addresses
   addresses, err = resolve_host(host, r, r.TYPE_A)
   if not addresses then
     ngx.log(ngx.ERR, "failed to query the DNS server: " .. tostring(err))
-    return ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
+    return nil
   elseif #addresses == 0 then
     ngx.log(ngx.ERR, "DNS resolve to empty result")
-    return ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
+    return nil
   end
 
-  ngx.ctx.upstream_pods = addresses
+  return addresses
 end
 
 return _M
