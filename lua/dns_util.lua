@@ -15,8 +15,7 @@ local function a_records(answers)
 end
 
 local function resolve_host(host, r, qtype)
-  local answers
-  answers, err = r:query(host, { qtype = qtype }, {})
+  local answers, err = r:query(host, { qtype = qtype }, {})
   if not answers then
     return nil, tostring(err)
   end
@@ -34,8 +33,7 @@ local function resolve_host(host, r, qtype)
 end
 
 function _M.resolve(host)
-  local r
-  r, err = resolver:new{
+  local r, err = resolver:new{
     nameservers = configuration.nameservers,
     retrans = 5,
     timeout = 2000,  -- 2 sec
@@ -46,8 +44,7 @@ function _M.resolve(host)
     return nil
   end
 
-  local addresses
-  addresses, err = resolve_host(host, r, r.TYPE_A)
+  local addresses, err = resolve_host(host, r, r.TYPE_A)
   if not addresses then
     ngx.log(ngx.ERR, string.format("failed to query the DNS server: DNS: %s, error: %s", host, tostring(err)))
     return nil

@@ -2,6 +2,7 @@ local ngx_balancer = require "ngx.balancer"
 local dns_util = require "dns_util"
 local resty_roundrobin = require "balancer.roundrobin"
 
+local UPSTREAMS_SYNC_INTERVAL = 5
 local balancers = {}
 local _M = {}
 
@@ -22,6 +23,10 @@ local function generate_full_address(ip, port)
   return table.concat({ip, ":", port})
 end
 
+local function sync_upstreams()
+  ngx.log(ngx.INFO, "sync")
+end
+
 function _M.rewrite()
   local backend_name = ngx.var.upstream_name
   local backend_port = ngx.var.upstream_port
@@ -31,6 +36,7 @@ function _M.rewrite()
     return
   end
 
+  ngx.log(ngx.NOTICE, string.format("no balancer for backend %s. Create a new balancer", backend_name))
   local ips = dns_util.resolve(backend_name)
   if not ips or #ips == 0 then
     ngx.status = ngx.HTTP_SERVICE_UNAVAILABLE
@@ -44,6 +50,14 @@ function _M.rewrite()
   end
 
   balancers[backend_name] = create_balancer(backends)
+end
+
+function _M.init_worker()
+  sync_upstreams() -- when worker starts, sync upstream without delay
+  local _, err = ngx.timer.every(UPSTREAMS_SYNC_INTERVAL, sync_upstreams)
+  if err then
+    ngx.log(ngx.ERR, string.format("error when setting up timer.every for sync_upstreams: %s", tostring(err)))
+  end
 end
 
 function _M.balance()

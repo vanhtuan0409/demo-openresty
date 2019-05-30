@@ -18,7 +18,7 @@ uninstall:
 	rm -rf ${INSTALL_DIR}
 
 start_nginx:
-	./openresty/bin/openresty -p `pwd`/ -c conf/nginx.conf
+	./openresty/bin/openresty -p `pwd`/ -c conf/nginx.conf -g 'daemon off;'
 
 stop_nginx:
 	./openresty/bin/openresty -p `pwd`/ -s stop
